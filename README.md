@@ -1,0 +1,1 @@
+# serverless-full-stack-apps-azure-synapse
