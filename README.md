@@ -6,9 +6,9 @@ https://learn.microsoft.com/en-us/azure/developer/python/configure-local-develop
 https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-vs-code-python?pivots=python-mode-decorators
 https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-cli-python?pivots=python-mode-decorators&tabs=azure-cli%2Cbash
 
-python3 -m venv venv
-virtualenv --python="/usr/bin/python3" venv
-venv/bin/Activate.ps1
+python3 -m venv .venv
+virtualenv --python="/usr/bin/python3" .venv
+.venv/bin/Activate.ps1
 
 func init LocalFunctionProj --python -m V2
 
