@@ -1,0 +1,107 @@
+service_location='eastus2'
+resource_group_name='serverless'
+
+storage_acct_name='blobstoragereno'
+
+adls_acct_name='datalakereno'
+fsys_name='filesystem'
+dir_name='finance_data'
+
+key_vault_name='kv-reno'
+abs_secret_name='abs-access-key1'
+adls_secret_name='adls-access-key1'
+
+# ###########################################################################################
+# Create an Azure Resource Group to organize the Azure services used in this series logically
+# ###########################################################################################
+az group create \
+    --location $service_location \
+    --name $resource_group_name
+
+# #########################################################################################
+# Create a general-purpose storage account in your resource group and assign it an identity
+# #########################################################################################
+az storage account create \
+    --name $storage_acct_name \
+    --resource-group $resource_group_name \
+    --location $service_location \
+    --sku Standard_LRS \
+    --assign-identity
+
+# Create a storage container in a storage account.
+az storage container create \
+    --name $abs_container_name \
+    --account-name $storage_acct_name \
+    --auth-mode login
+
+az storage container create \
+    --name $abs_archive_container_name \
+    --account-name $storage_acct_name \
+    --auth-mode login
+
+storage_acct_id=$(az storage account show \
+                    --name $storage_acct_name  \
+                    --resource-group $resource_group_name \
+                    --query 'id' \
+                    --output tsv)
+
+# Capture storage account access key1
+storage_acct_key1=$(az storage account keys list \
+                        --resource-group $resource_group_name \
+                        --account-name $storage_acct_name \
+                        --query [0].value \
+                        --output tsv)
+
+# ##########################
+# Create a ADLS Gen2 account
+# ##########################
+az storage account create \
+    --name $adls_acct_name \
+    --resource-group $resource_group_name \
+    --kind StorageV2 \
+    --hns \
+    --location $service_location \
+    --assign-identity
+
+# Create a file system in ADLS Gen2
+az storage fs create \
+    --name $fsys_name \
+    --account-name $adls_acct_name \
+    --auth-mode login
+
+# Create a directory in ADLS Gen2 file system
+az storage fs directory create \
+    --name $dir_name \
+    --file-system $fsys_name \
+    --account-name $adls_acct_name \
+    --auth-mode login
+
+adls_acct_key1=$(az storage account keys list \
+                    --resource-group $resource_group_name \
+                    --account-name $adls_acct_name \
+                    --query [0].value
+                    --output tsv)
+
+# ###################################################
+# Provision new Azure Key Vault in our resource group
+# ###################################################
+az keyvault create  \
+    --location $service_location \
+    --name $key_vault_name \
+    --resource-group $resource_group_name
+
+# Create Secret for Azure Blob Storage Account
+az keyvault secret set \
+    --vault-name $key_vault_name \
+    --name $abs_secret_name \
+    --value $storage_acct_key1
+
+# Create Secret for Azure Data Lake Storage Account
+az keyvault secret set \
+    --vault-name $key_vault_name \
+    --name $adls_secret_name \
+    --value $adls_acct_key1
+
+export KEY_VAULT_NAME=$key_vault_name
+export ABS_SECRET_NAME=$abs_secret_name
+export ADLS_SECRET_NAME=$adls_secret_name
