@@ -106,9 +106,9 @@ az keyvault secret set \
     --name $adls_secret_name \
     --value $adls_acct_key1
 
-#export KEY_VAULT_NAME=$key_vault_name
-#export ABS_SECRET_NAME=$abs_secret_name
-#export ADLS_SECRET_NAME=$adls_secret_name
+export KEY_VAULT_NAME=$key_vault_name
+export ABS_SECRET_NAME=$abs_secret_name
+export ADLS_SECRET_NAME=$adls_secret_name
 
 # #######################################################
 # Create a serverless function app in the resource group.
