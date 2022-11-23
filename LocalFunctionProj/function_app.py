@@ -2,7 +2,6 @@ import logging
 import os
 from io import StringIO
 import pandas as pd
-import numpy as np
 from datetime import datetime, timedelta
 
 import azure.functions as func

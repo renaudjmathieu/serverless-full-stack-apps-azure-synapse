@@ -7,9 +7,8 @@ https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-vs
 https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-cli-python?pivots=python-mode-decorators&tabs=azure-cli%2Cbash
 
 python3 -m venv .venv
-virtualenv --python="/usr/local/bin/python3.9" .venv
-.venv/bin/Activate.ps1
-pip install -r requirements.txt                                                              v
+source .venv/bin/activate
+pip install -r requirements.txt
 
 func init LocalFunctionProj --python -m V2
 
