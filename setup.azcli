@@ -132,6 +132,9 @@ az functionapp config appsettings set --name CloudETLFunc-reno --resource-group 
 # Update function app's settings to include Azure Data Lake Storage Gen 2 Access Key in Azure Key Vault secret environment variable.
 az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings  "ADLS_SECRET_NAME=adls-access-key1"
 
+# To use the Python v2 model in your function app, you need to add a new application setting in Azure named AzureWebJobsFeatureFlags with a value of EnableWorkerIndexing. This setting is already in your local.settings.json
+az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings AzureWebJobsFeatureFlags=EnableWorkerIndexing
+
 # Generate managed service identity for function app
 az functionapp identity assign \
     --resource-group $resource_group_name \

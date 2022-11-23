@@ -18,6 +18,30 @@ def return_blob_files(container_client, arg_date, std_date_format):
 
     return blob_files
 
+def read_csv_to_dataframe(container_client, filename, file_delimiter= ','):
+    blob_client = container_client.get_blob_client(blob=filename)
+
+    # Retrieve extract blob file
+    blob_download = blob_client.download_blob()
+
+    # Read blob file into DataFrame
+    blob_data = StringIO(blob_download.content_as_text())
+    df = pd.read_csv(blob_data,delimiter=file_delimiter)
+    return df
+
+def ingest_relational_data(container_client, blob_file_list):
+    df = pd.concat([read_csv_to_dataframe(container_client=container_client, filename=blob_name.name) for blob_name in blob_file_list], ignore_index=True)
+
+    return df
+
+def run_cloud_etl(source_container_client, blob_file_list):
+    df = ingest_relational_data(source_container_client, blob_file_list)
+
+    # Check the blob file data
+    logging.info(df.head(5))
+
+    return True
+
 @app.function_name(name="HttpTrigger1")
 @app.route(route="hello") # HTTP Trigger
 def test_function(req: func.HttpRequest) -> func.HttpResponse:
@@ -57,6 +81,11 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
             std_date_format = std_date_format
         )
 
+        run_cloud_etl(
+            source_container_client = abs_container_client,
+            blob_file_list= process_file_list
+        )
+
     except Exception as e:
         logging.info(e)
 
@@ -66,8 +95,3 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     return func.HttpResponse("This HTTP triggered function executed successfully.")
-
-@app.function_name(name="HttpTrigger2")
-@app.route(route="hello2") # HTTP Trigger
-def test_function(req: func.HttpRequest) -> func.HttpResponse:
-    return func.HttpResponse("HttpTrigger2 function processed a request!!!")

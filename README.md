@@ -30,3 +30,7 @@ kill -9 {PID}
 
 cd LocalFunctionProj
 func start
+http://localhost:7071/api/hello
+
+func azure functionapp publish CloudETLFunc-reno
+https://cloudetlfunc-reno.azurewebsites.net/api/hello?code=cHXr-pgXPozjxv-A_g981HVUHsP08Nht0dqn0O3tWX6WAzFu9N_cnQ==
