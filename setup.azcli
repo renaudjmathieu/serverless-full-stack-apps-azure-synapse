@@ -2,6 +2,8 @@ service_location='eastus2'
 resource_group_name='serverless'
 
 storage_acct_name='blobstoragereno'
+abs_container_name='demo-cloudetl-data'
+abs_archive_container_name='demo-cloudetl-archive'
 
 adls_acct_name='datalakereno'
 fsys_name='filesystem'
@@ -11,16 +13,18 @@ key_vault_name='kv-reno'
 abs_secret_name='abs-access-key1'
 adls_secret_name='adls-access-key1'
 
-# ###########################################################################################
-# Create an Azure Resource Group to organize the Azure services used in this series logically
-# ###########################################################################################
+funcapp_name='CloudETLFunc-reno'
+
+# ############################################################################################
+# Create an Azure Resource Group to organize the Azure services used in this series logically.
+# ############################################################################################
 az group create \
     --location $service_location \
     --name $resource_group_name
 
-# #########################################################################################
-# Create a general-purpose storage account in your resource group and assign it an identity
-# #########################################################################################
+# ##########################################################################################
+# Create a general-purpose storage account in your resource group and assign it an identity.
+# ##########################################################################################
 az storage account create \
     --name $storage_acct_name \
     --resource-group $resource_group_name \
@@ -52,9 +56,9 @@ storage_acct_key1=$(az storage account keys list \
                         --query [0].value \
                         --output tsv)
 
-# ##########################
-# Create a ADLS Gen2 account
-# ##########################
+# ###########################
+# Create a ADLS Gen2 account.
+# ###########################
 az storage account create \
     --name $adls_acct_name \
     --resource-group $resource_group_name \
@@ -82,9 +86,9 @@ adls_acct_key1=$(az storage account keys list \
                     --query [0].value
                     --output tsv)
 
-# ###################################################
-# Provision new Azure Key Vault in our resource group
-# ###################################################
+# ####################################################
+# Provision new Azure Key Vault in our resource group.
+# ####################################################
 az keyvault create  \
     --location $service_location \
     --name $key_vault_name \
@@ -102,6 +106,70 @@ az keyvault secret set \
     --name $adls_secret_name \
     --value $adls_acct_key1
 
-export KEY_VAULT_NAME=$key_vault_name
-export ABS_SECRET_NAME=$abs_secret_name
-export ADLS_SECRET_NAME=$adls_secret_name
+#export KEY_VAULT_NAME=$key_vault_name
+#export ABS_SECRET_NAME=$abs_secret_name
+#export ADLS_SECRET_NAME=$adls_secret_name
+
+# #######################################################
+# Create a serverless function app in the resource group.
+# #######################################################
+az functionapp create \
+    --name $funcapp_name \
+    --storage-account $storage_acct_name \
+    --consumption-plan-location $service_location \
+    --resource-group $resource_group_name \
+    --os-type Linux \
+    --runtime python \
+    --runtime-version 3.9 \
+    --functions-version 4
+
+# Update function app's settings to include Azure Key Vault environment variable.
+az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings "KEY_VAULT_NAME=kv-reno"
+
+# Update function app's settings to include Azure Blob Storage Access Key in Azure Key Vault secret environment variable.
+az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings  "ABS_SECRET_NAME=abs-access-key1"
+
+# Update function app's settings to include Azure Data Lake Storage Gen 2 Access Key in Azure Key Vault secret environment variable.
+az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings  "ADLS_SECRET_NAME=adls-access-key1"
+
+# Generate managed service identity for function app
+az functionapp identity assign \
+    --resource-group $resource_group_name \
+    --name $funcapp_name
+
+# Capture function app managed identity id
+func_principal_id=$(az resource list \
+            --name $funcapp_name \
+            --query [*].identity.principalId \
+            --output tsv)
+
+# Capture key vault object/resource id
+kv_scope=$(az resource list \
+                --name $key_vault_name \
+                --query [*].id \
+                --output tsv)
+
+# set permissions policy for function app to key vault - get list and set
+az keyvault set-policy \
+    --name $key_vault_name \
+    --resource-group $resource_group_name \
+    --object-id $func_principal_id \
+    --secret-permission get list set
+
+# Create a 'Key Vault Contributor' role assignment for function app managed identity
+az role assignment create \
+    --assignee $func_principal_id \
+    --role 'Key Vault Contributor' \
+    --scope $kv_scope
+
+# Assign the 'Storage Blob Data Contributor' role to the function app managed identity
+az role assignment create \
+    --assignee $func_principal_id \
+    --role 'Storage Blob Data Contributor' \
+    --resource-group  $resource_group_name
+
+# Assign the 'Storage Queue Data Contributor' role to the function app managed identity
+az role assignment create \
+    --assignee $func_principal_id \
+    --role 'Storage Queue Data Contributor' \
+    --resource-group  $resource_group_name
