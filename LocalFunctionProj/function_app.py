@@ -68,15 +68,15 @@ def process_relational_data(df, columns, groupby_columns):
     # Remove leading and trailing whitespace in df column names
     processed_df = df.rename(columns=lambda x: x.strip())
 
-    # Filter DataFrame (df) columns
-    processed_df = processed_df.loc[:, columns]
-
     # Clean column names for easy consumption
     processed_df.columns = processed_df.columns.str.strip()
     processed_df.columns = processed_df.columns.str.lower()
     processed_df.columns = processed_df.columns.str.replace(' ', '_')
     processed_df.columns = processed_df.columns.str.replace('(', '')
     processed_df.columns = processed_df.columns.str.replace(')', '')
+
+    # Filter DataFrame (df) columns
+    processed_df = processed_df.loc[:, columns]
 
     # Filter out all empty rows, if they exist.
     processed_df.dropna(inplace=True)
@@ -114,6 +114,8 @@ def run_cloud_etl(service_client, storage_account_url, source_container, archive
 
     return result
 
+app = func.FunctionApp()
+
 @app.function_name(name="CloudETL")
 @app.route(route="cloudetl") # HTTP Trigger
 def demo_relational_data_cloudetl(req: func.HttpRequest) -> func.HttpResponse:
@@ -137,19 +139,20 @@ def demo_relational_data_cloudetl(req: func.HttpRequest) -> func.HttpResponse:
         key_vault_Uri = f"https://{key_vault_name}.vault.azure.net"
         blob_secret_name = os.environ["ABS_SECRET_NAME"]
 
-        abs_acct_name='stcloudetldemodata'
+        abs_acct_name='blobstoragereno'
         abs_acct_url=f'https://{abs_acct_name}.blob.core.windows.net/'
         abs_container_name='demo-cloudetl-data'
         archive_container_name = 'demo-cloudetl-archive'
 
-        adls_acct_name='dlscloudetldemo'
+        adls_acct_name='datalakereno'
         adls_acct_url = f'https://{adls_acct_name}.dfs.core.windows.net/'
-        adls_fsys_name='processed-data-demo'
+        adls_fsys_name='filesystem'
         adls_dir_name='finance_data'
         adls_secret_name='adls-access-key1'
 
         # Authenticate and securely retrieve Key Vault secret for access key value.
-        az_credential = DefaultAzureCredential()
+        az_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True, exclude_visual_studio_code_credential=True)
+        
         secret_client = SecretClient(vault_url=key_vault_Uri, credential= az_credential)
         access_key_secret = secret_client.get_secret(blob_secret_name)
 
