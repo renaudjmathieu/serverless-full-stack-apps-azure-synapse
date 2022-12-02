@@ -6,8 +6,10 @@ azure-storage-file-datalake
 azure-identity
 azure-storage-blob
 azure-keyvault-secrets
+azure-core
 azure-functions
 azure-mgmt-storage
 pandas
 pyarrow
 fastparquet
+microsoft-bing-newssearch
