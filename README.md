@@ -1,10 +1,9 @@
 # serverless-full-stack-apps-azure-synapse
 
-https://learn.microsoft.com/en-us/azure/developer/python/tutorial-deploy-serverless-cloud-etl-01
-https://learn.microsoft.com/en-us/azure/developer/python/configure-local-development-environment
-
-https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-vs-code-python?pivots=python-mode-decorators
-https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-cli-python?pivots=python-mode-decorators&tabs=azure-cli%2Cbash
+https://github.com/Azure-Samples/msdocs-python-etl-serverless/tree/main
+https://azure.github.io/Cloud-Native/Fall-For-IA/HackTogether/
+https://www.youtube.com/watch?v=wToHU8Hts9c
+https://learn.microsoft.com/en-us/azure/app-service/quickstart-python
 
 python3 -m venv .venv
 virtualenv --python="/usr/bin/python3" .venv
@@ -30,3 +29,8 @@ kill -9 {PID}
 
 cd LocalFunctionProj
 func start
+
+
+
+
+
