@@ -124,7 +124,7 @@ az functionapp create \
     --functions-version 4
 
 # Update function app's settings to include Azure Key Vault environment variable.
-az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings "KEY_VAULT_NAME=kv-reno"
+az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings "KEY_VAULT_NAME=kv-reno-2"
 
 # Update function app's settings to include Azure Blob Storage Access Key in Azure Key Vault secret environment variable.
 az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings "ABS_SECRET_NAME=abs-access-key1"
