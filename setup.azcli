@@ -9,7 +9,7 @@ adls_acct_name='datalakereno'
 fsys_name='filesystem'
 dir_name='finance_data'
 
-key_vault_name='kv-reno'
+key_vault_name='kv-reno-2'
 abs_secret_name='abs-access-key1'
 adls_secret_name='adls-access-key1'
 
