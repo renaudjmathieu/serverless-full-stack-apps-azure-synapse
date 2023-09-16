@@ -127,10 +127,10 @@ az functionapp create \
 az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings "KEY_VAULT_NAME=kv-reno"
 
 # Update function app's settings to include Azure Blob Storage Access Key in Azure Key Vault secret environment variable.
-az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings  "ABS_SECRET_NAME=abs-access-key1"
+az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings "ABS_SECRET_NAME=abs-access-key1"
 
 # Update function app's settings to include Azure Data Lake Storage Gen 2 Access Key in Azure Key Vault secret environment variable.
-az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings  "ADLS_SECRET_NAME=adls-access-key1"
+az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings "ADLS_SECRET_NAME=adls-access-key1"
 
 # To use the Python v2 model in your function app, you need to add a new application setting in Azure named AzureWebJobsFeatureFlags with a value of EnableWorkerIndexing. This setting is already in your local.settings.json
 az functionapp config appsettings set --name CloudETLFunc-reno --resource-group serverless --settings AzureWebJobsFeatureFlags=EnableWorkerIndexing
