@@ -1,8 +1,11 @@
 # serverless-full-stack-apps-azure-synapse
 
 https://github.com/Azure-Samples/msdocs-python-etl-serverless/tree/main
+
 https://azure.github.io/Cloud-Native/Fall-For-IA/HackTogether/
+
 https://www.youtube.com/watch?v=wToHU8Hts9c
+
 https://learn.microsoft.com/en-us/azure/app-service/quickstart-python
 
 python3 -m venv .venv
